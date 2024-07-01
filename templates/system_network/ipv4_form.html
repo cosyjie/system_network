@@ -1,0 +1,75 @@
+{% extends 'layout_panel.html' %}
+{% load appcommon_html %}
+
+{% block js_code %}
+<script type="text/javascript">
+layui.use(function() {
+    var form = layui.form;
+    var layer = layui.layer;
+
+    form.on('select(ipv4method-filter)', function(data) {
+        var elem = data.elem;
+        var value = data.value;
+        var othis = data.othis;
+
+        if (value=='auto'){
+            $('#manual').attr('class', 'layui-hide');
+        }
+        if (value=='manual'){
+            $('#manual').attr('class', 'layui-show');
+        }
+    })
+
+})
+</script>
+{% endblock %}
+
+
+{% block pagecontent %}
+{% include 'include_messages.html' %}
+<form method="post" class="layui-form">{%  csrf_token %}
+    <div class="card">
+        <div class="card-body">
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ form.ipv4method.label }}</label>
+    <div class="layui-input-block">
+        <div class="layui-input-inline">{{ form.ipv4method }}</div>
+    </div>
+  </div>
+<div id="manual" class="{% if form.ipv4method.value == 'manual' %}layui-show{% else %}layui-hide{% endif %}">
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ form.ipv4addr.label }}</label>
+    <div class="layui-input-block">
+        <div class="layui-input-inline">{{ form.ipv4addr }}</div>
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ form.netmask.label }}</label>
+    <div class="layui-input-block">
+        <div class="layui-input-inline">{{ form.netmask }}</div>
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ form.ipv4gateway.label }}</label>
+    <div class="layui-input-block">
+        <div class="layui-input-inline">{{ form.ipv4gateway }}</div>
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ form.ipv4dns.label }}</label>
+    <div class="layui-input-block">
+        <div class="layui-input-inline">{{ form.ipv4dns }}</div>
+    </div>
+  </div>
+
+</div>
+
+        </div>
+        <div class="card-footer">{% form_btn 'submit' 'reset' %}</div>
+    </div>
+</form>
+{% endblock %}

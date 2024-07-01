@@ -1,0 +1,125 @@
+{% extends 'layout_panel.html' %}
+
+{% block js_code %}
+<script type="text/javascript">
+  var layer = layui.layer;
+
+  $('.del_confirm').on('click', function(event){
+        event.preventDefault();
+        var url = $(this).data('url');
+        layer.confirm('禁用错误会导致操作系统重启后无法连接！</br>确定要禁用吗？', {
+          title: '禁用确认',
+          icon: 3,
+          closeBtn: 0,
+          btn: ['确定', '取消']
+        },  function(index){
+          window.location.href = url;
+          layer.close(index);
+        });
+  })
+
+</script>
+{% endblock %}
+
+
+{% block pagecontent %}
+    {% include 'include_messages.html' %}
+<div id="accordion">
+{% for k,value in devices.items %}
+    {% if k != 'lo' %}
+  <div class="card">
+    <a class="d-block w-100" data-toggle="collapse" href="#collapse{{ k }}" aria-expanded="true">
+      <div class="card-header{% if value.state_num == '100' %} bg-success{% endif %}{% if value.state_num == '30' %} bg-gray{% endif %}">
+      <h4 class="card-title">
+          {{ k }} ( {{ value.ipv4address|join:", "|default:"-"}} )
+      </h4>
+        <div class="card-tools">
+            {{ value.state }}
+        </div>
+    </div>
+     </a>
+    <div id="collapse{{ k }}" class="collapse{% if name == k %} show{% endif %}" data-parent="#accordion" style="">
+      <div class="card-body">
+      <div class="row">
+          <div class="col-md-6">
+            <dl class="row">
+              <dt class="col-sm-2">状态</dt>
+              <dd class="col-sm-10">{{ value.state }}
+          {% if value.state_num == '30' %}
+<a href="{% url 'module_system:system_network:autoconnect' 'enableddev' k %}?name={{ k }}" class="ml-2">启用</a>
+          {% endif %}</dd>
+              <dt class="col-sm-2">设备名</dt>
+              <dd class="col-sm-10">{{ k }}</dd>
+              <dt class="col-sm-2">类型</dt>
+              <dd class="col-sm-10">
+                  {% if value.capissoftware == '否'  %}物理{% else %}虚拟{% endif %} {{ value.type }}
+              </dd>
+              <dt class="col-sm-2">设备型号</dt>
+              <dd class="col-sm-10">{{ value.venddr }}{{ value.product }}</dd>
+              <dt class="col-sm-2">链路速度</dt>
+              <dd class="col-sm-10">{{ value.capspeed }}</dd>
+              <dt class="col-sm-2">MAC</dt>
+              <dd class="col-sm-10">{{ value.hwaddr }}</dd>
+              <dt class="col-sm-2">MTU</dt>
+              <dd class="col-sm-10">{{ value.mtu }}</dd>
+              </dd>
+            </dl>
+          </div>
+            <div class="col-md-6">
+                <dl class="row">
+              <dt class="col-sm-2">连接名称</dt>
+              <dd class="col-sm-10">{{ value.name }}</dd>
+              <dt class="col-sm-2">连接状态</dt>
+              <dd class="col-sm-10">{{ value.constate|default:"-" }}</dd>
+              <dt class="col-sm-2">自动连接</dt>
+              <dd class="col-sm-10">
+                  {%  if value.autoconnect == 'yes' %}是{% else %}<span class="text-danger text-bold">否</span>{% endif %}
+                  {% if value.conuuid != '--' %}
+  {% if value.autoconnect == 'yes' %}
+<a href="javascript:;" data-url="{% url 'module_system:system_network:autoconnect' 'disabled' value.conuuid %}?name={{ k }}" class="ml-2 del_confirm">禁止</a>
+  {% endif %}
+  {% if value.autoconnect == 'no' %}
+<a href="{% url 'module_system:system_network:autoconnect' 'enabled' value.conuuid %}?name={{ k }}" class="ml-2">启用</a>
+  {% endif %}
+                  {% endif %}
+                </dd>
+              <dt class="col-sm-2">IPv4配置</dt>
+              <dd class="col-sm-10">
+                  {{ value.ipv4method_cn }}
+                  {% if value.ipv4method_cn %}
+                  <a href="{% url 'module_system:system_network:ipv4_edit' k value.conuuid %}" class="ml-2">编辑</a>
+                    {% endif %}
+              </dd>
+              <dt class="col-sm-2">IPV4地址</dt>
+              <dd class="col-sm-10">
+                  {% if value.ipv4method == 'auto' %}{{ value.ipv4address|join:"<br/>" }}{% endif %}
+                {% if value.ipv4method == 'manual' %}{{ value.ipv4addr }}{% endif %}
+              </dd>
+              <dt class="col-sm-2">IPV6配置</dt>
+              <dd class="col-sm-10">{{ value.ipv6method_cn }}</dd>
+              <dt class="col-sm-2">IPV6地址</dt>
+              <dd class="col-sm-10">
+                  {% if value.ipv6method == 'auto' %}{{ value.ipv6address|join:"<br/>" }}{% endif %}
+                {% if value.ipv6method == 'manual' %}{{ value.ipv6addr }}{% endif %}
+              </dd>
+              <dt class="col-sm-2">网关</dt>
+              <dd class="col-sm-10">{{ value.ipv4gateway|default:'-' }}</dd>
+              <dt class="col-sm-2">DNS</dt>
+              <dd class="col-sm-10">
+                  {% if value.ipv4method == 'auto' %}{{ value.ipv4dns|join:"<br/>" }}{% endif %}
+                {% if value.ipv4method == 'manual' %}{{ value.ipv4dnsm }}{% endif %}
+
+               </dd>
+              <dt class="col-sm-2">配置文件</dt>
+              <dd class="col-sm-10">{{ value.filename }}</dd>
+            </dl>
+            </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+    {% endif %}
+{% endfor %}
+</div>
+{% endblock %}

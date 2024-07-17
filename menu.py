@@ -1,4 +1,4 @@
-from django.urls import reverse
+from django.urls import reverse_lazy
 
 menu = {
     'module_system': {
@@ -6,7 +6,7 @@ menu = {
             {
                 'name': 'system_network',
                 'title': '网络配置',
-                'href': reverse('module_system:system_network:device_list'),
+                'href': reverse_lazy('module_system:system_network:device_list'),
             },
         ]
     }
